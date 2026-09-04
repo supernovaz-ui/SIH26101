@@ -1,0 +1,856 @@
+/* ==========================================================================
+   1. DESIGN TOKENS
+   ========================================================================== */
+:root {
+  /* Brand / accent blues */
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-darker: #1e40af;
+  --color-primary-light: #3b82f6;
+  --color-primary-tint: #eff6ff;
+  --color-primary-tint-strong: #dbeafe;
+
+  /* Neutrals */
+  --color-bg: #eef4fc;
+  --color-card-bg: #ffffff;
+  --color-text-primary: #0f1b2d;
+  --color-text-secondary: #55647a;
+  --color-text-muted: #8a97ab;
+  --color-border: #e1e7f0;
+  --color-border-strong: #c9d3e2;
+
+  /* Semantic states */
+  --color-success: #15803d;
+  --color-success-bg: #f0fdf4;
+  --color-success-border: #86efac;
+  --color-error: #dc2626;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fca5a5;
+
+  /* Disabled */
+  --color-disabled-bg: #f3f5f8;
+  --color-disabled-border: #e6e9ef;
+  --color-disabled-text: #b0b8c4;
+
+  /* Surfaces / shapes */
+  --shape-blue-1: #cfe0fb;
+  --shape-blue-2: #dbe8fd;
+
+  /* Typography */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji";
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-card: 0 20px 45px -15px rgba(15, 40, 90, 0.18),
+    0 4px 12px -4px rgba(15, 40, 90, 0.08);
+  --shadow-btn: 0 6px 16px -4px rgba(37, 99, 235, 0.35);
+  --shadow-btn-hover: 0 8px 20px -4px rgba(37, 99, 235, 0.45);
+
+  /* Motion */
+  --transition-fast: 160ms ease;
+  --transition-base: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 320ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Card sizing */
+  --card-max-width: 440px;
+  --card-padding: 40px;
+}
+
+
+/* ==========================================================================
+   2. RESET & BASE
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h2,
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+input {
+  font-family: inherit;
+}
+
+
+/* ==========================================================================
+   3. PAGE LAYOUT & BACKGROUND
+   ========================================================================== */
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 24px;
+  background-image: linear-gradient(rgba(234, 242, 255, 0.25), rgba(234, 242, 255, 0.25));
+  background-position: center;
+}
+
+/* Subtle decorative background shapes, CSS only */
+.auth-page::before,
+.auth-page::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.auth-page::before {
+  width: 520px;
+  height: 520px;
+  top: -220px;
+  left: -180px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--shape-blue-2) 0%,
+    rgba(219, 232, 253, 0) 70%
+  );
+}
+
+.auth-page::after {
+  width: 620px;
+  height: 620px;
+  bottom: -280px;
+  right: -220px;
+  background: radial-gradient(
+    circle at 70% 70%,
+    var(--shape-blue-1) 0%,
+    rgba(207, 224, 251, 0) 70%
+  );
+}
+
+
+/* ==========================================================================
+   4. AUTH CARD
+   ========================================================================== */
+.form-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--card-max-width);
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--card-padding);
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ==========================================================================
+   5. HEADER (TITLE / SUBTITLE)
+   ========================================================================== */
+#auth-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--color-text-primary);
+}
+
+#auth-subtitle {
+  margin-top: 8px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+
+/* ==========================================================================
+   6. LOGIN / REGISTER TOGGLE
+   ========================================================================== */
+.auth-toggle {
+  position: relative;
+  display: flex;
+  margin-top: 28px;
+  padding: 4px;
+  background-color: #f1f5fb;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.auth-toggle button {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 10px 16px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-pill);
+  transition: color var(--transition-base);
+}
+
+.auth-toggle button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Sliding active indicator, built with pseudo-element on the wrapper */
+.auth-toggle::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background-color: var(--color-primary);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 10px -2px rgba(37, 99, 235, 0.4);
+  transition: transform var(--transition-base);
+}
+
+.auth-toggle button#register-toggle.active ~ *,
+.auth-toggle:has(#register-toggle.active)::before {
+  transform: translateX(100%);
+}
+
+.auth-toggle button.active {
+  color: #ffffff;
+}
+
+.auth-toggle button:not(.active):hover {
+  color: var(--color-primary-dark);
+}
+
+
+/* ==========================================================================
+   7. FORM LAYOUT & LABELS
+   ========================================================================== */
+.login-container,
+.register-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 28px;
+  animation: form-enter var(--transition-slow);
+}
+
+.login-container.hidden,
+.register-container.hidden {
+  display: none;
+}
+
+.login-container label,
+.register-container label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 7px;
+}
+
+.login-container label:not(:first-child),
+.register-container label:not(:first-child) {
+  margin-top: 18px;
+}
+
+
+/* ==========================================================================
+   8. INPUTS (BASE, ICONS, STATES)
+   ========================================================================== */
+.login-container input,
+.register-container input {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px 0 44px;
+  font-size: 15px;
+  color: var(--color-text-primary);
+  background-color: #fbfcfe;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-base),
+    background-color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.login-container input::placeholder,
+.register-container input::placeholder {
+  color: var(--color-text-muted);
+  font-size: 14.5px;
+}
+
+/* Hover state */
+.login-container input:hover,
+.register-container input:hover {
+  border-color: var(--color-primary-light);
+}
+
+/* Focus state */
+.login-container input:focus,
+.register-container input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px var(--color-primary-tint-strong);
+}
+
+/* Icon placeholders: inputs are expected to sit inside a wrapper that
+   positions a leading icon. Space is reserved via left padding above.
+   These utility classes style an icon element if/when markup provides one
+   (e.g. <span class="input-icon">) without altering existing HTML. */
+.input-icon-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: color var(--transition-base);
+}
+
+.login-container input:focus ~ .input-icon,
+.register-container input:focus ~ .input-icon {
+  color: var(--color-primary);
+}
+
+/* Right-side space reserved for validation icons / password toggle */
+.input-indicator {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: color var(--transition-base), opacity var(--transition-base);
+}
+
+.input-indicator {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.input-indicator svg {
+  width: 18px;
+  height: 18px;
+}
+
+.input-icon-wrapper:has(input.valid) .input-indicator {
+  opacity: 1;
+}
+
+/* -------------------- Validation state utility classes -------------------- */
+
+/* Normal (default) — no override needed, base styles above apply */
+
+/* Invalid / error */
+.login-container input.invalid,
+.register-container input.invalid,
+.login-container input:invalid.touched,
+.register-container input:invalid.touched {
+  border-color: var(--color-error-border);
+  background-color: var(--color-error-bg);
+}
+
+.login-container input.invalid:focus,
+.register-container input.invalid:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+}
+
+/* Valid / success */
+.login-container input.valid,
+.register-container input.valid {
+  border-color: var(--color-success-border);
+  background-color: var(--color-success-bg);
+}
+
+.login-container input.valid:focus,
+.register-container input.valid:focus {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.12);
+}
+
+/* Disabled */
+.login-container input:disabled,
+.register-container input:disabled,
+.login-container input.disabled,
+.register-container input.disabled {
+  background-color: var(--color-disabled-bg);
+  border-color: var(--color-disabled-border);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.login-container input:disabled::placeholder,
+.register-container input:disabled::placeholder {
+  color: var(--color-disabled-text);
+}
+
+
+/* ==========================================================================
+   9. PASSWORD REQUIREMENTS
+   ========================================================================== */
+.password-requirements {
+  list-style: none;
+  margin: 10px 0 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.password-requirements li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  transition: color var(--transition-base);
+}
+
+/* Check indicator dot/icon, neutral by default */
+.password-requirements li::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border-strong);
+  background-color: transparent;
+  transition: background-color var(--transition-base),
+    border-color var(--transition-base);
+}
+
+/* Satisfied requirement */
+.password-requirements li.met {
+  color: var(--color-success);
+}
+
+.password-requirements li.met::before {
+  border-color: var(--color-success);
+  background-color: var(--color-success);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.5L6.5 11.5L12.5 4.5' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 10px 10px;
+}
+
+/* Password input reflecting "all requirements met" success state */
+#register-password.requirements-met {
+  border-color: var(--color-success-border);
+  background-color: var(--color-success-bg);
+}
+
+#register-password.requirements-met:focus {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.12);
+}
+
+
+/* ==========================================================================
+   10. PASSWORD TOGGLE (SHOW/HIDE) ICON
+   ========================================================================== */
+.password-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.password-toggle:hover {
+  color: var(--color-primary);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+
+/* ==========================================================================
+   11. BUTTONS (PRIMARY)
+   ========================================================================== */
+#login-btn,
+#register-btn {
+  width: 100%;
+  height: 50px;
+  margin-top: 26px;
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  transition: background-color var(--transition-base),
+    box-shadow var(--transition-base), transform var(--transition-fast);
+}
+
+#login-btn:hover,
+#register-btn:hover {
+  background-color: var(--color-primary-dark);
+  box-shadow: var(--shadow-btn-hover);
+}
+
+#login-btn:active,
+#register-btn:active {
+  background-color: var(--color-primary-darker);
+  transform: translateY(1px);
+  box-shadow: 0 3px 10px -3px rgba(37, 99, 235, 0.4);
+}
+
+#login-btn:focus-visible,
+#register-btn:focus-visible {
+  outline: 2px solid var(--color-primary-darker);
+  outline-offset: 3px;
+}
+
+#login-btn:disabled,
+#register-btn:disabled {
+  background-color: var(--color-disabled-border);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Loading state: apply class="loading" via JS alongside disabled button */
+#login-btn.loading,
+#register-btn.loading {
+  color: transparent;
+  pointer-events: none;
+  position: relative;
+}
+
+#login-btn.loading::after,
+#register-btn.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: btn-spin 700ms linear infinite;
+}
+
+
+/* ==========================================================================
+   12. DIVIDER ("OR")
+   ========================================================================== */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0;
+  color: var(--color-text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background-color: var(--color-border);
+}
+
+
+/* ==========================================================================
+   13. GOOGLE SIGN-IN BUTTON
+   ========================================================================== */
+.google-btn {
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #ffffff;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast),
+    border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.google-btn .google-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.google-btn:hover {
+  background-color: #f8fafc;
+  border-color: var(--color-border-strong);
+  box-shadow: 0 2px 8px -2px rgba(15, 40, 90, 0.1);
+}
+
+.google-btn:active {
+  background-color: #f1f5f9;
+}
+
+.google-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.google-btn:disabled {
+  background-color: var(--color-disabled-bg);
+  border-color: var(--color-disabled-border);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================================
+   14. LINKS
+   ========================================================================== */
+.auth-link,
+.forgot-password {
+  color: var(--color-primary);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.auth-link:hover,
+.forgot-password:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+.auth-link:focus-visible,
+.forgot-password:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.forgot-password-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+
+/* ==========================================================================
+   15. FORM TRANSITION ANIMATION
+   ========================================================================== */
+@keyframes form-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ==========================================================================
+   16. RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+
+/* Small mobile phones (< 380px) */
+@media (max-width: 379px) {
+  .auth-page {
+    padding: 14px;
+  }
+
+  .form-container {
+    max-width: 100%;
+    padding: 26px 20px;
+    border-radius: var(--radius-md);
+  }
+
+  #auth-title {
+    font-size: 21px;
+  }
+
+  #auth-subtitle {
+    font-size: 13px;
+  }
+
+  .login-container input,
+  .register-container input {
+    height: 44px;
+    font-size: 14px;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  #login-btn,
+  #register-btn,
+  .google-btn {
+    height: 46px;
+    font-size: 14.5px;
+  }
+}
+
+/* Large mobile phones (380px – 575px) */
+@media (min-width: 380px) and (max-width: 575px) {
+  .form-container {
+    max-width: 100%;
+    padding: 32px 22px;
+  }
+
+  #auth-title {
+    font-size: 23px;
+  }
+}
+
+/* Tablets (576px – 900px) */
+@media (min-width: 576px) and (max-width: 900px) {
+  .form-container {
+    max-width: 480px;
+    padding: 44px;
+  }
+
+  #auth-title {
+    font-size: 27px;
+  }
+
+  .login-container input,
+  .register-container input {
+    height: 50px;
+  }
+}
+
+/* Laptops (901px – 1279px) */
+@media (min-width: 901px) and (max-width: 1279px) {
+  .form-container {
+    max-width: 460px;
+  }
+}
+
+/* Large desktop monitors (>= 1280px) */
+@media (min-width: 1280px) {
+  .form-container {
+    max-width: 480px;
+    padding: 46px;
+  }
+
+  .auth-page::before {
+    width: 640px;
+    height: 640px;
+  }
+
+  .auth-page::after {
+    width: 760px;
+    height: 760px;
+  }
+}
+
+/* Touch devices: ensure comfortable tap targets */
+@media (hover: none) and (pointer: coarse) {
+  .auth-toggle button,
+  #login-btn,
+  #register-btn,
+  .google-btn,
+  .password-toggle {
+    min-height: 44px;
+  }
+}
+
+
+/* ==========================================================================
+   17. ACCESSIBILITY HELPERS
+   ========================================================================== */
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Ensure any focusable element inside the card always has a visible ring */
+.form-container :focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Screen-reader only helper text (e.g. for validation messages) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
