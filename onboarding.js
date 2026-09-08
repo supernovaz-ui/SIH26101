@@ -5,6 +5,10 @@
 (function () {
   "use strict";
 
+  const STORAGE_KEY = "sih26101Prototype";
+  const AUTH_PAGE = "index.html";
+  const RESULT_PAGE = "result.html";
+
   /* ---------------------------------------------------------
      1. ROLE-SPECIFIC Q3 OPTIONS
      --------------------------------------------------------- */
@@ -139,6 +143,51 @@
     ]
   };
 
+  const LEARNING_PATHS_BY_ROLE = {
+    stat_officer: [
+      { value: "statistical_analysis", label: "Statistical Analysis" },
+      { value: "stat_software", label: "R, SPSS, or Stata" },
+      { value: "python", label: "Python" },
+      { value: "sql", label: "SQL & Databases" },
+      { value: "data_visualization", label: "Power BI or Tableau" },
+    ],
+    data_analyst: [
+      { value: "data_cleaning", label: "Data Cleaning & Validation" },
+      { value: "sql", label: "SQL & Databases" },
+      { value: "python", label: "Python" },
+      { value: "data_visualization", label: "Power BI or Tableau" },
+      { value: "ai_ml", label: "AI / Machine Learning" },
+    ],
+    field_officer: [
+      { value: "excel", label: "Excel / Spreadsheets" },
+      { value: "survey_systems", label: "KoboToolbox or ODK" },
+      { value: "gis", label: "QGIS" },
+      { value: "data_quality", label: "Data Quality & Validation" },
+      { value: "survey_methodology", label: "Survey Methodology" },
+    ],
+    it_officer: [
+      { value: "sql", label: "SQL & Databases" },
+      { value: "python", label: "Python" },
+      { value: "api_integration", label: "REST APIs & Postman" },
+      { value: "cloud", label: "Cloud Technologies" },
+      { value: "data_engineering", label: "Data Engineering & ETL" },
+    ],
+    manager: [
+      { value: "project_management", label: "Project Management Tools" },
+      { value: "data_visualization", label: "Power BI or Tableau" },
+      { value: "communication", label: "Communication & Reporting" },
+      { value: "data_interpretation", label: "Data Interpretation" },
+      { value: "quality_assurance", label: "Quality Assurance" },
+    ],
+    other: [
+      { value: "excel", label: "Excel / Spreadsheets" },
+      { value: "sql", label: "SQL & Databases" },
+      { value: "python", label: "Python" },
+      { value: "data_visualization", label: "Power BI or Tableau" },
+      { value: "data_quality", label: "Data Quality & Validation" },
+    ],
+  };
+
 
   /* ---------------------------------------------------------
      2. CONTENT / DATA MODEL
@@ -241,12 +290,11 @@
         {
           id: "tools",
           type: "multi",
-          maxSelect: 4,
           eyebrow: "SKILLS & TECHNOLOGY",
 
           question: "Which skills or technologies are you most comfortable using?",
 
-          subtext: "Select up to 4 that best describe your current strengths.",
+          subtext: "Select the skills and technologies that best describe your current strengths.",
 
           /*
              IMPORTANT:
@@ -283,6 +331,156 @@
     reviewMode: false,
     isAnimating: false
   };
+
+  let activeUserId = null;
+
+  function emptyPrototypeStore() {
+    return {
+      version: 1,
+      activeUserId: null,
+      users: {},
+      profiles: {},
+    };
+  }
+
+  function readPrototypeStore() {
+    const fallback = emptyPrototypeStore();
+
+    try {
+      const saved = window.localStorage.getItem(STORAGE_KEY);
+      if (!saved) return fallback;
+
+      const parsed = JSON.parse(saved);
+      return {
+        ...fallback,
+        ...parsed,
+        users: parsed && typeof parsed.users === "object" && parsed.users ? parsed.users : {},
+        profiles: parsed && typeof parsed.profiles === "object" && parsed.profiles ? parsed.profiles : {},
+      };
+    } catch (error) {
+      console.warn("Could not read prototype data:", error);
+      return fallback;
+    }
+  }
+
+  function writePrototypeStore(store) {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  }
+
+  function totalQuestionCount() {
+    return STAGES.reduce((total, stage) => total + stage.questions.length, 0);
+  }
+
+  function completedQuestionsBeforeCurrent() {
+    return STAGES.slice(0, state.stageIndex)
+      .reduce((total, stage) => total + stage.questions.length, 0) + state.questionIndex;
+  }
+
+  function currentQuestionNumber() {
+    return completedQuestionsBeforeCurrent() + 1;
+  }
+
+  function calculateCompetencyLevel(answers) {
+    const experienceScores = {
+      "0-1": 0,
+      "1-3": 1,
+      "3-5": 2,
+      "5+": 3,
+    };
+
+    const selectedTools = Array.isArray(answers.tools) ? answers.tools : [];
+    const recognisedTools = selectedTools.filter((tool) => tool !== "none" && tool !== "other");
+    const skillScore = Math.min(recognisedTools.length, 3);
+    const score = (experienceScores[answers.experience] || 0) + skillScore;
+
+    if (score <= 1) return "Beginner";
+    if (score <= 4) return "Intermediate";
+    return "Advanced";
+  }
+
+  function calculateRecommendedTools(answers) {
+    const knownTools = new Set(Array.isArray(answers.tools) ? answers.tools : []);
+    const learningPath = LEARNING_PATHS_BY_ROLE[answers.currentRole] || LEARNING_PATHS_BY_ROLE.other;
+
+    return learningPath
+      .filter((item) => !knownTools.has(item.value))
+      .map((item) => item.label);
+  }
+
+  function buildResult(answers) {
+    const recommendedTools = calculateRecommendedTools(answers);
+
+    return {
+      competencyLevel: recommendedTools.length === 0
+        ? "Advanced"
+        : calculateCompetencyLevel(answers),
+      recommendedTools,
+    };
+  }
+
+  function persistProfile(result) {
+    if (!activeUserId) return;
+
+    const store = readPrototypeStore();
+    const profile = store.profiles[activeUserId] || {};
+
+    profile.onboarding = {
+      answers: state.answers,
+      completed: state.completed,
+      completedAt: state.completed ? new Date().toISOString() : null,
+    };
+
+    if (result) {
+      profile.result = {
+        ...result,
+        calculatedAt: new Date().toISOString(),
+      };
+    }
+
+    store.profiles[activeUserId] = profile;
+    writePrototypeStore(store);
+  }
+
+  function clearSavedResult() {
+    if (!activeUserId) return;
+
+    const store = readPrototypeStore();
+    const profile = store.profiles[activeUserId] || {};
+    delete profile.result;
+    store.profiles[activeUserId] = profile;
+    writePrototypeStore(store);
+  }
+
+  function restoreActiveProfile() {
+    const store = readPrototypeStore();
+    activeUserId = store.activeUserId;
+
+    if (!activeUserId || !store.users[activeUserId]) {
+      window.location.replace(AUTH_PAGE);
+      return false;
+    }
+
+    const profile = store.profiles[activeUserId] || {};
+    const onboarding = profile.onboarding;
+
+    if (onboarding && onboarding.answers && typeof onboarding.answers === "object") {
+      state.answers = onboarding.answers;
+    }
+
+    if (onboarding && onboarding.completed && profile.result) {
+      window.location.replace(RESULT_PAGE);
+      return false;
+    }
+
+    return true;
+  }
+
+  function signOut() {
+    const store = readPrototypeStore();
+    store.activeUserId = null;
+    writePrototypeStore(store);
+    window.location.assign(AUTH_PAGE);
+  }
 
 
   /* ---------------------------------------------------------
@@ -411,12 +609,7 @@
 
     if (state.completed) return 100;
 
-    const totalQ = STAGES[state.stageIndex].questions.length;
-
-    const base = state.stageIndex * STAGE_RANGE;
-
-    return base +
-      (state.questionIndex / totalQ) * STAGE_RANGE;
+    return (completedQuestionsBeforeCurrent() / totalQuestionCount()) * 100;
   }
 
 
@@ -563,7 +756,7 @@
     } else {
 
       el.progressSub.textContent =
-        `Step ${state.stageIndex + 1} of ${STAGES.length} · ${STAGES[state.stageIndex].title}`;
+        `Step ${currentQuestionNumber()} of ${totalQuestionCount()} · ${STAGES[state.stageIndex].title}`;
     }
 
     updatePlant(pct);
@@ -1094,6 +1287,8 @@
     renderQuestionView(null);
 
     renderProgressBar();
+
+    persistProfile();
   }
 
 
@@ -1206,6 +1401,10 @@
 
     state.reviewMode = false;
 
+    const result = buildResult(state.answers);
+
+    persistProfile(result);
+
     renderAll("forward");
 
     showToast(
@@ -1237,10 +1436,7 @@
       dashboardBtn.addEventListener(
         "click",
         () => {
-
-          showToast(
-            "Heading to your dashboard…"
-          );
+          window.location.assign(RESULT_PAGE);
 
         }
       );
@@ -1260,6 +1456,9 @@
           state.stageIndex = 0;
 
           state.questionIndex = 0;
+
+          clearSavedResult();
+          persistProfile();
 
           renderAll("backward");
 
@@ -1344,6 +1543,17 @@
      16. INIT
      --------------------------------------------------------- */
 
-  renderAll(null);
+  function init() {
+    if (!restoreActiveProfile()) return;
+
+    const signOutButton = document.querySelector(".sign-out");
+    if (signOutButton) {
+      signOutButton.addEventListener("click", signOut);
+    }
+
+    renderAll(null);
+  }
+
+  init();
 
 })();

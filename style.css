@@ -854,3 +854,61 @@ input {
   white-space: nowrap;
   border: 0;
 }
+
+/* Successful authentication notice */
+.auth-success-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.auth-success-notice.visible { opacity: 1; }
+
+.auth-success-card {
+  width: min(100%, 380px);
+  padding: 26px 28px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid rgba(64, 192, 87, 0.34);
+  border-radius: 18px;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.2);
+  transform: translateY(10px) scale(0.98);
+  transition: transform 220ms ease;
+}
+
+.auth-success-notice.visible .auth-success-card {
+  transform: translateY(0) scale(1);
+}
+
+.auth-success-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 13px;
+  color: #fff;
+  background: #2f9e44;
+  border-radius: 50%;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.auth-success-card strong {
+  display: block;
+  color: #1f2937;
+  font-size: 18px;
+}
+
+.auth-success-card p {
+  margin: 8px 0 0;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.5;
+}

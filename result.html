@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Career Path</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="result.css">
+  <script src="result.js" defer></script>
+</head>
+<body>
+  <main class="result-shell">
+    <section class="result-card" aria-labelledby="result-title">
+      <p class="eyebrow">YOUR CAREER PATH</p>
+      <h1 id="result-title">Your learning path is ready.</h1>
+      <p class="intro" id="welcomeText"></p>
+
+      <section class="result-section competency-section" aria-labelledby="competency-title">
+        <span class="section-label" id="competency-title">Competency Level</span>
+        <strong id="competencyLevel" class="competency-level">Loading…</strong>
+      </section>
+
+      <section class="result-section" aria-labelledby="tools-title">
+        <span class="section-label" id="tools-title">Recommended Tools / Technologies to Learn</span>
+        <ul id="recommendedTools" class="tool-list"></ul>
+      </section>
+
+      <div class="result-actions">
+        <button class="button button-secondary" id="reviewButton" type="button">Review responses</button>
+        <button class="button button-primary" id="signOutButton" type="button">Sign out</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

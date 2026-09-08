@@ -15,8 +15,48 @@
     special: { test: (v) => /[^A-Za-z0-9]/.test(v), label: "At least 1 special character" },
   };
 
+  const STORAGE_KEY = "sih26101Prototype";
+  const ONBOARDING_PAGE = "onboarding.html";
+
   // Simulated network delay for the prototype auth calls (ms).
   const SIMULATED_AUTH_DELAY = 1200;
+
+  function emptyPrototypeStore() {
+    return {
+      version: 1,
+      activeUserId: null,
+      users: {},
+      profiles: {},
+    };
+  }
+
+  function readPrototypeStore() {
+    const fallback = emptyPrototypeStore();
+
+    try {
+      const saved = window.localStorage.getItem(STORAGE_KEY);
+      if (!saved) return fallback;
+
+      const parsed = JSON.parse(saved);
+      return {
+        ...fallback,
+        ...parsed,
+        users: parsed && typeof parsed.users === "object" && parsed.users ? parsed.users : {},
+        profiles: parsed && typeof parsed.profiles === "object" && parsed.profiles ? parsed.profiles : {},
+      };
+    } catch (error) {
+      console.warn("Could not read prototype data:", error);
+      return fallback;
+    }
+  }
+
+  function writePrototypeStore(store) {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  }
+
+  function normalizeEmail(email) {
+    return email.trim().toLowerCase();
+  }
 
   /* ========================================================================
      2. DOM REFERENCES
@@ -109,6 +149,42 @@
     }
     button.classList.remove("loading");
     button.disabled = false;
+  }
+
+  function showAuthSuccess(message) {
+    const existingNotice = document.querySelector(".auth-success-notice");
+    if (existingNotice) existingNotice.remove();
+
+    const notice = document.createElement("div");
+    notice.className = "auth-success-notice";
+    notice.setAttribute("role", "status");
+    notice.setAttribute("aria-live", "polite");
+
+    const card = document.createElement("div");
+    card.className = "auth-success-card";
+
+    const icon = document.createElement("span");
+    icon.className = "auth-success-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = "✓";
+
+    const title = document.createElement("strong");
+    title.textContent = "Success";
+
+    const copy = document.createElement("p");
+    copy.textContent = message;
+
+    card.append(icon, title, copy);
+    notice.appendChild(card);
+    document.body.appendChild(notice);
+
+    window.requestAnimationFrame(() => {
+      notice.classList.add("visible");
+    });
+
+    window.setTimeout(() => {
+      window.location.assign(ONBOARDING_PAGE);
+    }, 900);
   }
 
   /* ========================================================================
@@ -421,16 +497,13 @@
   }
 
   function handleRegisterSuccess(registrationData) {
-    // Prototype-only feedback. Replace with real post-registration flow
-    // (e.g. redirect, session creation) once a backend is connected.
-    window.alert(
-      `Prototype: account created for ${registrationData.email}. No real account exists yet — connect a backend to make this functional.`
+    showAuthSuccess(
+      `Account created for ${registrationData.email}. Let's set up your career path.`
     );
-    showLogin();
   }
 
   function handleRegisterFailure(error) {
-    window.alert("Prototype: registration could not be completed. Please try again.");
+    window.alert(error.message || "Registration could not be completed. Please try again.");
     // eslint-disable-next-line no-console
     console.error("Registration prototype error:", error.message);
   }
@@ -532,18 +605,44 @@
   }
 
   async function simulateLogin(credentials) {
-    // `credentials.password` is used only in-memory for this simulated call
-    // and is never logged, stored, or persisted.
     await simulateAuthDelay();
-    return { email: credentials.email };
+
+    const store = readPrototypeStore();
+    const userId = normalizeEmail(credentials.email);
+    const user = store.users[userId];
+
+    if (!user || user.password !== credentials.password) {
+      throw new Error("No matching account was found for that email and password.");
+    }
+
+    store.activeUserId = userId;
+    writePrototypeStore(store);
+    return user;
   }
 
   async function simulateAccountCreation(registrationData, password) {
-    // `password` is used only in-memory for this simulated call and is
-    // never logged, stored, or persisted.
-    void password;
     await simulateAuthDelay();
-    return { ...registrationData };
+
+    const store = readPrototypeStore();
+    const userId = normalizeEmail(registrationData.email);
+
+    if (store.users[userId]) {
+      throw new Error("An account with this email already exists. Please log in instead.");
+    }
+
+    const user = {
+      id: userId,
+      fullName: registrationData.fullName,
+      email: registrationData.email.trim(),
+      password,
+    };
+
+    store.users[userId] = user;
+    store.profiles[userId] = store.profiles[userId] || {};
+    store.activeUserId = userId;
+    writePrototypeStore(store);
+
+    return user;
   }
 
   async function simulateGoogleSignIn() {
@@ -593,13 +692,11 @@
   }
 
   function handleLoginSuccess(email) {
-    // Prototype-only feedback. Replace with real session handling / redirect
-    // once a backend is connected.
-    window.alert(`Prototype: login simulated for ${email}. No real session has been created.`);
+    showAuthSuccess(`Welcome back, ${email}. Redirecting to your career path.`);
   }
 
   function handleLoginFailure(error) {
-    window.alert("Prototype: login could not be completed. Please try again.");
+    window.alert(error.message || "Login could not be completed. Please try again.");
     // eslint-disable-next-line no-console
     console.error("Login prototype error:", error.message);
   }
