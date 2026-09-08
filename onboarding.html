@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="onboarding1.css">
+<script src="onboarding1.js" defer></script>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============ HEADER ============ -->
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 1L1 5V11L8 15L15 11V5L8 1Z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M8 8L1 5" stroke="white" stroke-width="1.4"/>
+          <path d="M8 8L15 5" stroke="white" stroke-width="1.4"/>
+          <path d="M8 8V15" stroke="white" stroke-width="1.4"/>
+        </svg>
+      </span>
+      <span class="brand-name"></span>
+    </div>
+    <button class="sign-out" type="button" aria-label="Sign out">
+      Sign out
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M6 2H3.5C2.67 2 2 2.67 2 3.5V12.5C2 13.33 2.67 14 3.5 14H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M10.5 11L14 8L10.5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- ============ MAIN GRID ============ -->
+  <div class="app-body">
+
+    <!-- LEFT: JOURNEY SIDEBAR (desktop only) -->
+    <aside class="journey-sidebar" id="journeySidebar" aria-label="Onboarding stages">
+      <h2 class="journey-title">Your Journey</h2>
+      <ol class="journey-list" id="journeyList"><!-- rendered by JS --></ol>
+      <p class="journey-quote">&ldquo;A clear career path starts with knowing yourself.&rdquo;</p>
+    </aside>
+
+    <!-- CENTER: MAIN ONBOARDING CONTENT -->
+    <main class="main-content">
+
+      <!-- PROGRESS CARD -->
+      <section class="progress-card" id="progressCard" aria-label="Onboarding progress">
+        <div class="progress-top">
+          <div class="progress-heading">
+            <span class="progress-title">Your Progress</span>
+            <span class="progress-sub" id="progressSub">Step 1 of 5 · Current Role</span>
+          </div>
+          <div class="progress-plant-cluster" id="progressPlantCluster">
+            <span class="progress-percent" id="progressPercent">0%</span>
+            <span class="plant-holder plant-holder--sm" id="plantHolderSmall"><!-- plant svg injected --></span>
+          </div>
+        </div>
+
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBarWrap">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <ol class="milestones" id="milestones"><!-- rendered by JS --></ol>
+      </section>
+
+      <!-- QUESTION / COMPLETION VIEWPORT -->
+      <section class="question-viewport" id="questionViewport" aria-live="polite">
+        <!-- .question-panel injected by JS -->
+      </section>
+
+      <!-- NAV CONTROLS -->
+      <div class="nav-controls" id="navControls">
+        <button class="btn btn-back" id="backBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back
+        </button>
+        <button class="btn btn-continue" id="continueBtn" type="button" disabled>
+          <span id="continueLabel">Continue</span>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+    </main>
+
+    <!-- RIGHT: VISUAL PANEL (desktop only) -->
+    <aside class="visual-panel" aria-hidden="true">
+      <div class="visual-panel-inner">
+        <span class="plant-holder plant-holder--lg" id="plantHolderLarge"><!-- plant svg injected --></span>
+        <p class="visual-caption">Good skills today, brighter opportunities tomorrow.</p>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+</body>
+</html>
